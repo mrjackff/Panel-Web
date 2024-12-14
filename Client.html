@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebSocket Client</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        #output {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            max-height: 200px;
+            overflow-y: scroll;
+        }
+        .message {
+            padding: 5px;
+            margin: 2px 0;
+            background-color: #e9e9e9;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        input[type="text"], button {
+            padding: 10px;
+            margin: 5px;
+        }
+        button {
+            cursor: pointer;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>WebSocket Client for Streamer</h1>
+
+    <div>
+        <h2>Login</h2>
+        <input type="text" id="username" placeholder="Enter username">
+        <input type="password" id="password" placeholder="Enter password">
+        <button onclick="login()">Login</button>
+    </div>
+
+    <div>
+        <h2>Commands</h2>
+        <button onclick="sendCommand('aimbotscan')">Aimbot Scan</button>
+        <button onclick="sendCommand('aimbotenable')">Enable Aimbot</button>
+        <button onclick="sendCommand('aimbotdisable')">Disable Aimbot</button>
+        <button onclick="sendCommand('esp_menu_on')">ESP Menu On</button>
+        <button onclick="sendCommand('disconnect')">Disconnect</button>
+    </div>
+
+    <div>
+        <h2>Output</h2>
+        <div id="output"></div>
+    </div>
+
+    <script>
+        var socket;
+        
+        // Connect to WebSocket server
+        function connectToWebSocket() {
+            socket = new WebSocket('https://sukunacheatsweb.netlify.app:2365');
+            
+            socket.onopen = function() {
+                console.log('Connected to WebSocket server');
+                appendMessage('Connected to WebSocket server');
+            };
+            
+            socket.onmessage = function(event) {
+                console.log('Message from server: ', event.data);
+                appendMessage(event.data);
+            };
+            
+            socket.onclose = function() {
+                console.log('Disconnected from server');
+                appendMessage('Disconnected from server');
+            };
+            
+            socket.onerror = function(error) {
+                console.log('WebSocket Error: ', error);
+                appendMessage('Error: ' + error);
+            };
+        }
+        
+        // Login function
+        function login() {
+            var username = document.getElementById("username").value;
+            var password = document.getElementById("password").value;
+
+            if (username && password) {
+                socket.send('login:' + username + ':' + password);
+            } else {
+                alert('Please enter both username and password');
+            }
+        }
+
+        // Send command function
+        function sendCommand(command) {
+            if (socket.readyState === WebSocket.OPEN) {
+                socket.send(command);
+            } else {
+                appendMessage('Connection is not open');
+            }
+        }
+
+        // Append message to output area
+        function appendMessage(message) {
+            var output = document.getElementById("output");
+            var newMessage = document.createElement("div");
+            newMessage.classList.add("message");
+            newMessage.textContent = message;
+            output.appendChild(newMessage);
+
+            // Auto-scroll
+            output.scrollTop = output.scrollHeight;
+        }
+
+        // Initialize WebSocket connection
+        connectToWebSocket();
+    </script>
+
+</body>
+</html>
