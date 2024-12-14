@@ -68,7 +68,7 @@
         
         // Connect to WebSocket server
         function connectToWebSocket() {
-            socket = new WebSocket('https://sukunacheatsweb.netlify.app:2365');
+             socket = new WebSocket('ws://localhost:2365');
             
             socket.onopen = function() {
                 console.log('Connected to WebSocket server');
